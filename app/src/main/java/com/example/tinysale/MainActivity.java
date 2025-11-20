@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
         System.out.print("This is a test");
         System.out.print("But this is also a test");
+
+        System.out.print("25");
     }
 
 
