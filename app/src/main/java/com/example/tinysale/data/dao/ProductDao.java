@@ -31,4 +31,8 @@ public interface ProductDao {
 
     @Query("SELECT * FROM products WHERE id = :id LIMIT 1")
     LiveData<Product> getProductById(int id);
+
+    // FINAL: use the actual column name stock_amount and method name decrementStock
+    @Query("UPDATE products SET stock_amount = stock_amount - :amount WHERE sku = :sku")
+    void decrementStock(String sku, int amount);
 }

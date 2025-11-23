@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">TinySale</string>
+
+    <string-array name="payment_methods">
+        <item>Cash</item>
+        <item>Card</item>
+        <item>Other</item>
+    </string-array>
 </resources>

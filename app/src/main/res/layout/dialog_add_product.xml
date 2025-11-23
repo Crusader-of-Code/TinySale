@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <!-- SKU -->
+    <EditText
+        android:id="@+id/etDialogSku"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="SKU"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Scan SKU button -->
+    <Button
+        android:id="@+id/btnScanSku"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan SKU"
+        app:layout_constraintTop_toBottomOf="@id/etDialogSku"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Description -->
+    <EditText
+        android:id="@+id/etDialogDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Description"
+        app:layout_constraintTop_toBottomOf="@id/btnScanSku"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Price -->
+    <EditText
+        android:id="@+id/etDialogPrice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Price"
+        android:inputType="numberDecimal"
+        app:layout_constraintTop_toBottomOf="@id/etDialogDescription"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/etDialogStock"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"/>
+
+    <!-- Stock -->
+    <EditText
+        android:id="@+id/etDialogStock"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Stock"
+        android:inputType="number"
+        app:layout_constraintTop_toBottomOf="@id/etDialogDescription"
+        app:layout_constraintStart_toEndOf="@id/etDialogPrice"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

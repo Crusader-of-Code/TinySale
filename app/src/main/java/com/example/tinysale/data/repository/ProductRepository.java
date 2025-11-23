@@ -15,37 +15,35 @@ import java.util.concurrent.Executors;
 public class ProductRepository {
 
     private final ProductDao productDao;
-    private final LiveData<List<Product>> allProducts;
-    private final ExecutorService executorService;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public ProductRepository(Application application) {
         AppDatabase db = AppDatabase.getInstance(application);
         productDao = db.productDao();
-        allProducts = productDao.getAllProducts();
-        executorService = Executors.newSingleThreadExecutor();
     }
 
     public LiveData<List<Product>> getAllProducts() {
-        return allProducts;
+        return productDao.getAllProducts();
     }
 
     public LiveData<Product> getProductBySku(String sku) {
         return productDao.getProductBySku(sku);
     }
 
-    public LiveData<Product> getProductById(int id) {
-        return productDao.getProductById(id);
-    }
-
     public void insert(Product product) {
-        executorService.execute(() -> productDao.insert(product));
+        executor.execute(() -> productDao.insert(product));
     }
 
     public void update(Product product) {
-        executorService.execute(() -> productDao.update(product));
+        executor.execute(() -> productDao.update(product));
     }
 
     public void delete(Product product) {
-        executorService.execute(() -> productDao.delete(product));
+        executor.execute(() -> productDao.delete(product));
+    }
+
+    // NEW: decrement stock
+    public void decrementStock(String sku, int quantity) {
+        executor.execute(() -> productDao.decrementStock(sku, quantity));
     }
 }
