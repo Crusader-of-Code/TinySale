@@ -19,6 +19,7 @@ import com.example.tinysale.data.entity.Sale;
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
+    int thing = 0;
 
     public abstract ProductDao productDao();
     public abstract SaleDao saleDao();
@@ -40,3 +41,5 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 }
+
+//need to add ability to delete databases
