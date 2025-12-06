@@ -23,7 +23,6 @@ import com.example.tinysale.ui.viewmodel.CartItem;
 import com.example.tinysale.ui.viewmodel.ProductViewModel;
 import com.example.tinysale.ui.viewmodel.SaleViewModel;
 
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +44,7 @@ public class NewSaleActivity extends AppCompatActivity {
     private TextView tvSubtotal;
     private TextView tvFinalTotal;
     private Button btnCompleteSale;
+    private EditText etSku;      // NEW: manual SKU field
 
     // ViewModels
     private ProductViewModel productViewModel;
@@ -79,6 +79,7 @@ public class NewSaleActivity extends AppCompatActivity {
         tvSubtotal           = findViewById(R.id.tvSubtotal);
         tvFinalTotal         = findViewById(R.id.tvFinalTotal);
         btnCompleteSale      = findViewById(R.id.btnCompleteSale);
+        etSku                = findViewById(R.id.etSku); // make sure this ID exists in XML
 
         // ===== Default Tax Rate (Orlando) =====
         etTaxRate.setText("6.5");
@@ -126,7 +127,7 @@ public class NewSaleActivity extends AppCompatActivity {
         productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
         saleViewModel = new ViewModelProvider(this).get(SaleViewModel.class);
 
-        // Optional: load products (useful for future features)
+        // Optional: load products (not required for scanning/typing to work)
         productViewModel.getAllProducts().observe(this, products -> {
             productList.clear();
             if (products != null) {
@@ -163,6 +164,9 @@ public class NewSaleActivity extends AppCompatActivity {
 
             if (barcodeValue != null && !barcodeValue.isEmpty()) {
 
+                // Sync the typed SKU field with the scanned value
+                etSku.setText(barcodeValue);
+
                 // Lookup product by SKU == barcode
                 productViewModel.getProductBySku(barcodeValue).observe(this, product -> {
 
@@ -186,11 +190,8 @@ public class NewSaleActivity extends AppCompatActivity {
     // ===================== CART LOGIC =====================
 
     private void addItemToCart() {
-        if (selectedProduct == null) {
-            Toast.makeText(this, "Scan a product first", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
+        // --- 1. Validate quantity first ---
         String qtyStr = etQuantity.getText().toString().trim();
         if (qtyStr.isEmpty()) {
             Toast.makeText(this, "Enter a quantity", Toast.LENGTH_SHORT).show();
@@ -210,15 +211,50 @@ public class NewSaleActivity extends AppCompatActivity {
             return;
         }
 
-        // Add to cart
+        // --- 2. If we already have a selectedProduct (from scan or previous lookup), just use it ---
+        if (selectedProduct != null) {
+            addSelectedProductToCart(quantity);
+            return;
+        }
+
+        // --- 3. Otherwise, try to look it up by typed SKU ---
+        String typedSku = etSku.getText().toString().trim();
+        if (typedSku.isEmpty()) {
+            Toast.makeText(this,
+                    "Scan a product or enter its SKU first",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final int finalQuantity = quantity;
+
+        productViewModel.getProductBySku(typedSku).observe(this, product -> {
+            if (product != null) {
+                selectedProduct = product;
+
+                tvSelectedProduct.setText(
+                        selectedProduct.getProductDescription() +
+                                " - $" + String.format(Locale.getDefault(),
+                                "%.2f", selectedProduct.getPrice())
+                );
+
+                addSelectedProductToCart(finalQuantity);
+            } else {
+                Toast.makeText(this,
+                        "No product found with SKU: " + typedSku,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void addSelectedProductToCart(int quantity) {
         CartItem item = new CartItem(selectedProduct, quantity);
         cartItems.add(item);
         cartAdapter.setItems(cartItems);
 
-        // Recalculate totals
         recalculateTotals();
 
-        // Clear quantity (keep selected product for faster repeated scans if desired)
+        // Clear quantity; keep SKU & selectedProduct so user can add again quickly
         etQuantity.setText("");
     }
 
@@ -382,6 +418,8 @@ public class NewSaleActivity extends AppCompatActivity {
         etDiscountPercent.setText("");
         etTaxRate.setText("6.5");
         etCustomerEmail.setText("");
+        etSku.setText("");
+        selectedProduct = null;
         tvSelectedProduct.setText("No product selected");
         tvSubtotal.setText("Subtotal: $0.00");
         tvFinalTotal.setText("Total: $0.00");
